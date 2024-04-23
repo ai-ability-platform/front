@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+
+import MainPage from "./components/MainPage.vue";
 </script>
 
 <template>
   <div class="full-screen-layout">
-    <HelloWorld msg="Vite + Vue"/>
+    <MainPage/>
   </div>
 </template>
 
