@@ -12,9 +12,9 @@ const goRoute = (path) => {
 <template>
   <div class="hello-world">
     <el-container style="height: 100%">
-      <el-header>AI能力平台</el-header>
-      <el-container>
-        <el-aside style="width: 200px;height: 100%">
+      <el-header style="padding: 10px">AI能力平台</el-header>
+      <el-container style="margin-top: -30px">
+        <el-aside style="width: 200px;height: 100%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); margin-top: 19px">
           <el-menu
               default-active="2"
           >

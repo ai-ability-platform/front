@@ -32,46 +32,42 @@ const addInputBox = () => {
 const input = ref('')
 const sendInput = () => {
     // text.value = input.value
-    
+
     historyChat.value.push({
         name: 'huison',
         text: input.value
     })
-    
-    inputBox.value++
-    input.value = ''
+    receiveData()
+    // inputBox.value++
+    // input.value = ''
 }
 
-const historyChat = ref([
-    {
-        name: 'huison',
-        text: '你是谁？'
-    },
-    {
-        name: 'huison',
-        text: '我是huison'
-    },
-    {
-        name: 'huison',
-        text: '你好，我是huison'
-    }]);
+const historyChat = ref(
+    []
+);
+
+const receiveData = () => {
+    historyChat.value.push({
+        name: 'ai',
+        text: "我是一个基于 GPT-3.5 模型开发的 AI 机器人，可以回答各种问题并提供信息和建议。"
+    })
+}
+
 
 </script>
 
 <template>
-    <el-container style="height: 100%;">
-        <el-aside style="border: 2px solid #9f9fbd; height: 100% ">
+    <el-container style="height: 100%">
+        <el-aside style="border: 2px solid #fdfdfd; height: 100%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
             <el-button @click="add" class="chat-button">New chat</el-button>
-            <el-scrollbar>
-                <p v-for="item in count" :key="item" class="scrollbar-demo-item">
-                    {{ item }}
-                </p>
-            </el-scrollbar>
+                <div v-for="(item, index) in count" :key="item">
+                    <el-button class="chat-button">New chat</el-button>
+                </div>
         </el-aside>
-        <el-container>
-            <el-button @click="addInputBox">测试按钮</el-button>
-            <el-button @click="getChat">获取聊天数据</el-button>
-            <el-main>
+        <el-container style="margin-left: 10px">
+            <!--            <el-button @click="addInputBox">测试按钮</el-button>-->
+            <!--            <el-button @click="getChat">获取聊天数据</el-button>-->
+            <el-main style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
                 <template v-for="(chat, index) in historyChat" :key="index">
                     <el-row>
                         <el-text>{{ chat.name }}:</el-text>
@@ -80,26 +76,16 @@ const historyChat = ref([
                 </template>
             </el-main>
             <el-footer>
-                <el-input v-model="input" placeholder="请输入内容" style="width: 100%"/>
-                <el-button @click="sendInput">发送</el-button>
+                <div style="display: flex;margin: 20px">
+                    <el-input v-model="input" placeholder="请输入内容" style="width: 100%"/>
+                    <el-button @click="sendInput" @keydown.enter="sendInput" style="margin-left: 10px">发送</el-button>
+                </div>
             </el-footer>
         </el-container>
     </el-container>
 </template>
 
 <style scoped>
-.scrollbar-demo-item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 50px;
-    margin: 10px;
-    text-align: center;
-    border-radius: 4px;
-    background: var(--el-color-primary-light-9);
-    color: var(--el-color-primary);
-}
-
 .chat-button {
     display: flex;
     align-content: center;
