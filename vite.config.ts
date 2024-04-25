@@ -9,4 +9,12 @@ export default defineConfig({
       '@': '/src',
     },
   },
+  server: {
+    port: 5173,
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    },
+    host: '0.0.0.0',
+    open: true,
+  },
 })

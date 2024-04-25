@@ -30,7 +30,7 @@ const recStop = () => {
 // 打开 WebSocket 连接方法
 const websocketOpen = () => {
     if (!websocket.value || websocket.value.readyState !== WebSocket.OPEN) {
-        websocket.value = new WebSocket('ws://localhost:8000');
+        websocket.value = new WebSocket('ws://localhost:8000/api/v1/speech-to-text/ws');
         console.log("websocket连接成功")
 
         // 添加消息监听器前先移除可能存在的监听器
