@@ -63,20 +63,23 @@ const websocketClose = () => {
         websocket.value.close();
     }
 };
+
+const test = ref('测试数据')
+
 </script>
 
 <template>
     <el-container>
-        <el-header>
+        <el-header style="height: 100px; line-height: 100px; text-align: center">
             语音实时转写
         </el-header>
-        <el-main>
-            <h2 style="border: 2px solid #0f0f10; height: 100% ">
-                语音实时转写
-            </h2>
+        <el-main style="height: 500px; border: 2px solid #0f0f10;">
+            <el-text v-model="test">
+                {{ test }}
+            </el-text>
         </el-main>
 
-        <el-footer style="margin-top: 30%">
+        <el-footer style="margin-top: 1%; text-align: center">
             <el-button type="primary" @click="websocketOpen">建立websocket连接</el-button>
             <el-button type="primary" @click="recStart">开始录音</el-button>
             <el-button type="primary" @click="recStop">停止录音</el-button>
