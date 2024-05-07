@@ -1,22 +1,61 @@
 <script setup lang="ts">
-import {ref} from 'vue'
-import {chatApi} from "../../../api/chat";
+import {onMounted, ref} from 'vue'
+import {chatApi, getAllHistoryApi, createSessionApi, getHistorySessionApi} from "../../../api/chat";
+import {ChatRequest} from "../../../models/chat/ChatRequest.ts";
+import MarkdownIt from 'markdown-it';
 
+const selectedSession = ref({})
+
+const selectSession = async (session: any) => {
+    selectedSession.value = session
+    console.log("selectedSession = ", selectedSession.value)
+    // 获取该session的历史记录
+    const getHistorySessionApiRes = await getHistorySessionApi(
+        selectedSession.value.user_id,
+        selectedSession.value.session_id,
+    )
+    console.log("getHistorySessionApiRes.data = ", getHistorySessionApiRes.data)
+
+    historyChat.value = getHistorySessionApiRes.data
+    console.log("historyChat.value = ", historyChat.value)
+}
+const historyChat = ref(
+    []
+);
 
 const getChat = async () => {
-    const res = await chatApi("你是谁？")
+    // TODO 解决发送问题在等待的时候，可以重复发送的问题
+
+    const data = new FormData();
+    data.append('user_id', selectedSession.value.user_id);
+    data.append('session_id', selectedSession.value.session_id);
+    data.append('content', input.value);
+    console.log("historyChat.value = ", historyChat.value)
+    historyChat.value.push({
+        content: input.value,
+        role: "user"
+    })
+    input.value = ''
+
+    const res = await chatApi(data)
     console.log(res)
+    historyChat.value.push({
+        role: 'assistant',
+        content: res.data.content
+    })
+
 }
 
+const sessions = ref([])
 
-const count = ref(0)
-
-const add = () => {
-    count.value++
+const add = async () => {
+    const createSessionApiRes = await createSessionApi("1");
+    console.log("createSessionApiRes = ", createSessionApiRes)
+    sessions.value.push(createSessionApiRes.data)
 }
 const onDelete = () => {
-    if (count.value > 0) {
-        count.value--
+    if (sessions.value > 0) {
+        sessions.value--
     }
 }
 
@@ -42,9 +81,6 @@ const sendInput = () => {
     // input.value = ''
 }
 
-const historyChat = ref(
-    []
-);
 
 const receiveData = () => {
     historyChat.value.push({
@@ -54,31 +90,48 @@ const receiveData = () => {
 }
 
 
+onMounted(async () => {
+    // get all history chat
+    const getAllHistoryApiRes = await getAllHistoryApi("1");
+    console.log("getAllHistoryApiRes = ", getAllHistoryApiRes)
+    historyChat.value = getAllHistoryApiRes.data
+    console.log("historyChat = ", historyChat.value)
+    sessions.value = historyChat.value
+    console.log("sessions = ", sessions.value)
+})
+
+const renderMarkdown = (content) => {
+    console.log("content = ", content)
+    if (content !== undefined) {
+        return MarkdownIt().render(content);
+    }
+}
+
+
 </script>
 
 <template>
     <el-container style="height: 100%">
         <el-aside style="border: 2px solid #fdfdfd; height: 100%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
-            <el-button @click="add" class="chat-button">New chat</el-button>
-                <div v-for="(item, index) in count" :key="item">
-                    <el-button class="chat-button">New chat</el-button>
-                </div>
+            <el-button @click="add" class="chat-button">create new chat</el-button>
+            <div v-for="(session, index) in sessions" :key="index">
+                <el-button class="chat-button" @click="selectSession(session)">{{ session.session_name }}</el-button>
+            </div>
         </el-aside>
         <el-container style="margin-left: 10px">
-            <!--            <el-button @click="addInputBox">测试按钮</el-button>-->
-            <!--            <el-button @click="getChat">获取聊天数据</el-button>-->
             <el-main style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
                 <template v-for="(chat, index) in historyChat" :key="index">
-                    <el-row>
-                        <el-text>{{ chat.name }}:</el-text>
-                        <el-text>{{ chat.text }}</el-text>
+                    <el-row type="flex" :justify="chat.role === 'user' ? 'end' : 'start'" style="margin-bottom: 10px">
+                        <!-- todo markdown -->
+<!--                        <el-text>{{ chat.content }}</el-text>-->
+                        <el-text v-html="renderMarkdown(chat.content)"></el-text>
                     </el-row>
                 </template>
             </el-main>
             <el-footer>
                 <div style="display: flex;margin: 20px">
-                    <el-input v-model="input" placeholder="请输入内容" style="width: 100%"/>
-                    <el-button @click="sendInput" @keydown.enter="sendInput" style="margin-left: 10px">发送</el-button>
+                    <el-input v-model="input" @keydown.enter="getChat" placeholder="请输入内容" style="width: 100%"/>
+                    <el-button @click="getChat" style="margin-left: 10px">发送</el-button>
                 </div>
             </el-footer>
         </el-container>
